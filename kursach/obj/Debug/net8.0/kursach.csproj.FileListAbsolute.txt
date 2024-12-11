@@ -1,0 +1,14 @@
+C:\Users\sasha\RiderProjects\kursach\kursach\obj\Debug\net8.0\kursach.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\sasha\RiderProjects\kursach\kursach\obj\Debug\net8.0\kursach.AssemblyInfoInputs.cache
+C:\Users\sasha\RiderProjects\kursach\kursach\obj\Debug\net8.0\kursach.AssemblyInfo.cs
+C:\Users\sasha\RiderProjects\kursach\kursach\obj\Debug\net8.0\kursach.csproj.CoreCompileInputs.cache
+C:\Users\sasha\RiderProjects\kursach\kursach\bin\Debug\net8.0\kursach.exe
+C:\Users\sasha\RiderProjects\kursach\kursach\bin\Debug\net8.0\kursach.deps.json
+C:\Users\sasha\RiderProjects\kursach\kursach\bin\Debug\net8.0\kursach.runtimeconfig.json
+C:\Users\sasha\RiderProjects\kursach\kursach\bin\Debug\net8.0\kursach.dll
+C:\Users\sasha\RiderProjects\kursach\kursach\bin\Debug\net8.0\kursach.pdb
+C:\Users\sasha\RiderProjects\kursach\kursach\obj\Debug\net8.0\kursach.dll
+C:\Users\sasha\RiderProjects\kursach\kursach\obj\Debug\net8.0\refint\kursach.dll
+C:\Users\sasha\RiderProjects\kursach\kursach\obj\Debug\net8.0\kursach.pdb
+C:\Users\sasha\RiderProjects\kursach\kursach\obj\Debug\net8.0\kursach.genruntimeconfig.cache
+C:\Users\sasha\RiderProjects\kursach\kursach\obj\Debug\net8.0\ref\kursach.dll
