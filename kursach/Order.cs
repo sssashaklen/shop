@@ -9,7 +9,6 @@
         public string OrderDate { get; private set; } 
         public string OrderTime { get; private set; }
         public float OrderPrice { get; private set; }
-        public string OrderStatus { get; set; }
         public List <CartItem> Products { get; private set; }
         
         public Order(int customerId, Cart cart)
@@ -20,7 +19,6 @@
             OrderTime = DateTime.Now.ToString("HH:mm:ss");  
             Products = cart.Products; 
             OrderPrice = CalculateOrderPrice(); 
-            OrderStatus = "Pending"; 
         }
         
         private static int GetNextId()

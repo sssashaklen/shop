@@ -208,7 +208,7 @@ public class ViewOrderHistoryCommand(OrderService orderService) : ICommand
         Console.WriteLine("Order history:");
         foreach (var order in orders)
         {
-            Console.WriteLine($"Order ID: {order.OrderId} | Date: {order.OrderDate} | Time : {order.OrderTime} | Status: {order.OrderStatus}");
+            Console.WriteLine($"Order ID: {order.OrderId} | Date: {order.OrderDate} | Time : {order.OrderTime}");
             foreach (var item in order.Products)
             {
                 var price = item.Product.price * item.Quantity;

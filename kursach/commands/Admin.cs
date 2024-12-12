@@ -137,7 +137,7 @@ public class ViewAllOrderHistoryCommand(OrderService orderService) : ICommand
         Console.WriteLine("All orders:");
         foreach (var order in orders)
         {
-            Console.WriteLine($"Order ID: {order.OrderId} | Account ID: {order.CustomerId} | Date: {order.OrderDate} | Status: {order.OrderStatus}");
+            Console.WriteLine($"Order ID: {order.OrderId} | Account ID: {order.CustomerId} | Date: {order.OrderDate}");
             foreach (var item in order.Products)
             {
                 Console.WriteLine($"  - Product: {item.Product.name} | Price: {item.Product.price}");

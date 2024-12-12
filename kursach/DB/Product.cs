@@ -1,8 +1,13 @@
 ﻿namespace shop.DB;
 
-public class ProductRepository(DbContext dbContext) : IProductRepository
+public class ProductRepository : IProductRepository
 {
-    private readonly DbContext _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+    private readonly DbContext _dbContext;
+
+    public ProductRepository(DbContext dbContext)
+    {
+        _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+    }
 
     public void Create(Product product)
     {
@@ -29,7 +34,7 @@ public class ProductRepository(DbContext dbContext) : IProductRepository
             existingProduct.quantity = product.quantity;
         }
     }
-
+    
     public void Delete(Product product)
     {
         _dbContext.products.Remove(product);
