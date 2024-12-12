@@ -51,7 +51,6 @@ public class Program
 
     private static void ShowMenu(Dictionary<string, ICommand> commands)
     {
-        Console.Clear();
             
         Console.WriteLine("\nChoose an option:");
         foreach (var entry in commands)
@@ -60,7 +59,6 @@ public class Program
         }
         
         string input = Console.ReadLine();
-        Console.Clear();
         if (commands.TryGetValue(input, out ICommand command))
         {
             try

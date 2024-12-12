@@ -14,7 +14,8 @@ public abstract class Account
     
    public Cart Cart { get; set; } 
    public abstract Dictionary<string, ICommand> Commands { get; protected set; }
-   public Account(string name, int balance, string email,  string password, Cart cart)
+
+   protected Account(string name, int balance, string email,  string password, Cart cart)
    {
        Id = _globalId++;  
        Name = name;

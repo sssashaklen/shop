@@ -18,8 +18,6 @@ public class AddBalanceCommand : ICommand
         {
             Console.WriteLine("Invalid amount entered.");
         }
-
-        Console.ReadKey();
     }
 
     public string ShowInfo()
@@ -34,7 +32,6 @@ public class CheckBalanceCommand : ICommand
     {
         Account account = Program.currentAccount;
         Console.WriteLine($"Your current balance is: {account.Balance} ");
-        Console.ReadKey();
     }
 
     public string ShowInfo()
@@ -44,11 +41,9 @@ public class CheckBalanceCommand : ICommand
 }
 public class ViewProductsCommand(ProductService productService) : ICommand
 {
-    private ProductService _productService = productService;
-
     public void Execute()
     {
-        var products = _productService.ReadAll();
+        var products = productService.ReadAll();
         if (products.Count == 0)
         {
             Console.WriteLine("No products available.");
@@ -59,7 +54,6 @@ public class ViewProductsCommand(ProductService productService) : ICommand
         {
             Console.WriteLine($"ID: {product.id} | Name: {product.name} | Price: {product.price} | Quantity: {product.quantity} | Description: {product.description}");
         }
-        Console.ReadKey();
     }
 
     public string ShowInfo()
@@ -104,7 +98,6 @@ public class AddProductToCartCommand(ProductService productService, AccountServi
         {
             Console.WriteLine("Invalid product ID entered.");
         }
-        Console.ReadKey();
     }
     public string ShowInfo()
     {
@@ -160,7 +153,6 @@ public class DeleteProductFromCartCommand(AccountService accountService)
         {
             Console.WriteLine("Invalid product ID entered.");
         }
-        Console.ReadKey();
     }
 
     public string ShowInfo()
@@ -190,7 +182,6 @@ public class ViewCartCommand() : ICommand
             totalPrice += price;
         }
         Console.WriteLine($"Total price: {totalPrice}");
-        Console.ReadKey();
     }
 
     public string ShowInfo()
@@ -201,12 +192,11 @@ public class ViewCartCommand() : ICommand
 
 public class ViewOrderHistoryCommand(OrderService orderService) : ICommand
 {
-    private OrderService _orderService = orderService;
-    Account _account = Program.currentAccount;
+    private readonly Account _account = Program.currentAccount;
     public void Execute()
     {
         Console.Clear();
-        var orders = _orderService.GetOrdersByAccountId(_account.Id);
+        var orders = orderService.GetOrdersByAccountId(_account.Id);
         if (orders.Count == 0)
         {
             Console.WriteLine("You have no order history.");
@@ -227,7 +217,6 @@ public class ViewOrderHistoryCommand(OrderService orderService) : ICommand
             }
             Console.WriteLine($"  - Total price: {totalPrice}");
         }
-         Console.ReadKey();
     }
 
     public string ShowInfo()
@@ -244,10 +233,9 @@ public class CreateOrderCommand(OrderService orderService, ProductService produc
         var cart = account.Cart;
         Order order = new Order(account.Id, cart);
         var balance = account.Balance;
-        orderService.Create(order);
         if (order.OrderPrice <= balance)
         {
-            
+            orderService.Create(order);
             Console.WriteLine("Order created successfully.");
             Console.WriteLine($"Price: {order.OrderPrice}");
             foreach( var productItem in cart.Products)
@@ -263,7 +251,6 @@ public class CreateOrderCommand(OrderService orderService, ProductService produc
         {
             Console.WriteLine("Order could not be created. Please add money to balance.");
         }
-        Console.ReadKey();
     }
     public string ShowInfo()
     {

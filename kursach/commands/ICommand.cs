@@ -1,5 +1,4 @@
-﻿using shop.DB;
-
+﻿
 namespace shop.commands;
 
 public interface ICommand

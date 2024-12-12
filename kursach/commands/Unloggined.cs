@@ -3,15 +3,8 @@ using shop.DB;
 
 namespace shop.commands;
 
-public class CommandRegister : ICommand
+public class CommandRegister(AccountService accountService) : ICommand
 {
-    private AccountService _accountService;
-    
-    public CommandRegister(AccountService accountService)
-    {
-        _accountService = accountService;
-    }
-
     public void Execute()
     {
         string username, email, password;
@@ -41,7 +34,7 @@ public class CommandRegister : ICommand
         int balance = 0;
         
         Account newAccount = AccountFactory.CreateAccount(accountType, username, balance, email, password);
-        _accountService.Create(newAccount);
+        accountService.Create(newAccount);
         Program.currentAccount = newAccount;
         Console.WriteLine($"Account for {username} created.");
     }
@@ -82,21 +75,14 @@ public class CommandRegister : ICommand
     }
 }
 
-public class LoginCommand : ICommand
+public class LoginCommand(AccountService accountService) : ICommand
 {
-    private AccountService _accountService;
-
-    public LoginCommand(AccountService accountService)
-    {
-        _accountService = accountService;
-    }
-
     public void Execute()
     {
         Console.WriteLine("Please enter your account name: ");
         string username = Console.ReadLine();
 
-        Account account = _accountService.ReadByUserName(username);
+        Account account = accountService.ReadByUserName(username);
         if (account == null)
         {
             Console.WriteLine("Account not found!");
@@ -104,7 +90,7 @@ public class LoginCommand : ICommand
         }
 
         Console.WriteLine("Please enter your password: ");
-        string password = ReadPassword(); // Використовуємо метод ReadPassword без окремого класу
+        string password = ReadPassword();
 
         if (account.Password == password)
         {

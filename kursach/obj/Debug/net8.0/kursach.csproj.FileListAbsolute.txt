@@ -12,3 +12,4 @@ C:\Users\sasha\RiderProjects\kursach\kursach\obj\Debug\net8.0\refint\kursach.dll
 C:\Users\sasha\RiderProjects\kursach\kursach\obj\Debug\net8.0\kursach.pdb
 C:\Users\sasha\RiderProjects\kursach\kursach\obj\Debug\net8.0\kursach.genruntimeconfig.cache
 C:\Users\sasha\RiderProjects\kursach\kursach\obj\Debug\net8.0\ref\kursach.dll
+C:\Users\sasha\RiderProjects\kursach\kursach\obj\Debug\net8.0\kursach.sourcelink.json

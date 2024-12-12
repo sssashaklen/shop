@@ -1,6 +1,6 @@
 ﻿namespace shop;
 
-public class AccountFactory
+public static class AccountFactory
 {
     public static Account CreateAccount(int accountType, string name, int balance, string email, string password)
     {

@@ -1,14 +1,8 @@
 ﻿namespace shop
 {
-    public class Cart
+    public class Cart(List<CartItem> items)
     {
-        public int CartId { get; set; }
-        public List<CartItem> Products { get; set; } = new();
-        
-        public Cart(List<CartItem> items)
-        {
-            Products = items;
-        }
+        public List<CartItem> Products { get; set; } = items;
 
         public void AddToCart(Product product, int quantity)
         {
@@ -35,8 +29,8 @@
 
     public class CartItem(Product product, int quantity)
     {
-        public Product Product { get; set; } = product;
-        public int Quantity { get; set; } = quantity;
+        public Product Product { get; } = product;
+        public int Quantity { get; private set; } = quantity;
         
         public void IncreaseQuantity(int quantity)
         {

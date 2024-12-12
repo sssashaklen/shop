@@ -2,15 +2,8 @@
 
 namespace shop.commands;
 
-public class AddProductCommand : ICommand
+public class AddProductCommand(ProductService productService) : ICommand
 {
-    private ProductService _productService;
-
-    public AddProductCommand(ProductService productService)
-    {
-        _productService = productService;
-    }
-
     public void Execute()
     {
         Console.WriteLine("Enter product name: ");
@@ -34,7 +27,7 @@ public class AddProductCommand : ICommand
         }
         
         Product newProduct = new Product(name, description, price, quantity);
-        _productService.Create(newProduct);
+        productService.Create(newProduct);
         Console.WriteLine("Product added successfully.");
     }
 
@@ -43,24 +36,17 @@ public class AddProductCommand : ICommand
         return "Add Product";
     }
 }
-public class DeleteProductCommand : ICommand
+public class DeleteProductCommand(ProductService productService) : ICommand
 {
-    private ProductService _productService;
-
-    public DeleteProductCommand(ProductService productService)
-    {
-        _productService = productService;
-    }
-
     public void Execute()
     {
         Console.WriteLine("Enter product ID to delete: ");
         if (int.TryParse(Console.ReadLine(), out int productId))
         {
-            var product = _productService.ReadById(productId);
+            var product = productService.ReadById(productId);
             if (product != null)
             {
-                _productService.Delete(productId);
+                productService.Delete(productId);
                 Console.WriteLine($"Product {product.name} deleted successfully.");
             }
             else
@@ -79,21 +65,14 @@ public class DeleteProductCommand : ICommand
         return "Delete Product";
     }
 }
-public class UpdateProductCommand : ICommand
+public class UpdateProductCommand(ProductService productService) : ICommand
 {
-    private ProductService _productService;
-
-    public UpdateProductCommand(ProductService productService)
-    {
-        _productService = productService;
-    }
-
     public void Execute()
     {
         Console.WriteLine("Enter product ID to update: ");
         if (int.TryParse(Console.ReadLine(), out int productId))
         {
-            var product = _productService.ReadById(productId);
+            var product = productService.ReadById(productId);
             if (product != null)
             {
                 Console.WriteLine($"Updating product {product.name}");
@@ -126,7 +105,7 @@ public class UpdateProductCommand : ICommand
                     product.quantity = newQuantity;
                 }
 
-                _productService.Update(product);
+                productService.Update(product);
                 Console.WriteLine("Product updated successfully.");
             }
             else
@@ -144,18 +123,11 @@ public class UpdateProductCommand : ICommand
         return "Update Product";
     }
 }
-public class ViewAllOrderHistoryCommand : ICommand
+public class ViewAllOrderHistoryCommand(OrderService orderService) : ICommand
 {
-    private readonly OrderService _orderService;
-
-    public ViewAllOrderHistoryCommand(OrderService orderService)
-    {
-        _orderService = orderService;
-    }
-
     public void Execute()
     {
-        var orders = _orderService.ReadAll();
+        var orders = orderService.ReadAll();
         if (orders.Count == 0)
         {
             Console.WriteLine("No orders found.");
@@ -209,12 +181,10 @@ public class DeleteUserAccountCommand(AccountService accountService) : ICommand
 
 public class ViewAllAccountsCommand(AccountService accountService) : ICommand
 {
-    // Ініціалізуємо команду з AccountService
-
-    // Метод для виконання команди
+    
     public void Execute()
     {
-        var accounts = accountService.ReadAll(); // Отримуємо всі акаунти
+        var accounts = accountService.ReadAll(); 
 
         if (accounts.Count == 0)
         {
