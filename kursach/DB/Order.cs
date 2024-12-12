@@ -18,12 +18,7 @@ public class OrderRepository(DbContext dbContext) : IOrderRepository
     {
         return DbContext.orders.Count == 0 ? null : DbContext.orders;
     }
-
-    public void Update(Order order)
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public void Delete(int id)
     {
         var orders = ReadAll();
@@ -60,12 +55,7 @@ public class OrderService(OrderRepository orderRepository) : IOrderService
     {
         return orderRepository.ReadAll();
     }
-
-    public void Update(Order order)
-    {
-       orderRepository.Update(order);
-    }
-
+    
     public void Delete(int id)
     {
         orderRepository.Delete(id);
