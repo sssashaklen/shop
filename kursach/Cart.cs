@@ -1,8 +1,8 @@
-﻿namespace shop
-{
-    public class Cart(List<CartItem> items)
+﻿namespace shop;
+
+    public class Cart(List<CartItem>? products = null)
     {
-        public List<CartItem> Products { get; set; } = items;
+        public List<CartItem> Products { get; } = products ?? new List<CartItem>();
 
         public void AddToCart(Product product, int quantity)
         {
@@ -11,34 +11,46 @@
 
             if (quantity <= 0)
                 throw new ArgumentException("Quantity must be greater than zero.", nameof(quantity));
-
-            var cartItem = new CartItem(product, quantity);
+            
+            CartItem item = new CartItem(product, quantity);
             
             var existingCartItem = Products.FirstOrDefault(item => item.Product.id == product.id);
 
             if (existingCartItem != null)
             {
-                existingCartItem.IncreaseQuantity(cartItem.Quantity);
+                existingCartItem.IncreaseQuantity(item.Quantity);
             }
             else
             {
-                Products.Add(cartItem);
+                Products.Add(item);
             }
         }
     }
 
-    public class CartItem(Product product, int quantity)
+    public class CartItem
     {
-        public Product Product { get; } = product;
-        public int Quantity { get; private set; } = quantity;
+        public Product Product { get; private set; }
+        public int Quantity { get; private set; }
+
+        public CartItem(Product product, int quantity)
+        {
+            if (product == null) 
+                throw new ArgumentNullException(nameof(product), "Product cannot be null.");
+            if (quantity <= 0) 
+                throw new ArgumentException("Quantity must be greater than zero.", nameof(quantity));
         
-        public void IncreaseQuantity(int quantity)
-        {
-            Quantity += quantity;
+            Product = product; 
+            Quantity = quantity; 
         }
-        public void DecreaseQuantity(int quantity)
+
+        public void IncreaseQuantity(int amount)
         {
-            Quantity -= quantity;
+            Quantity += amount;
+        }
+
+        public void DecreaseQuantity(int amount)
+        {
+            Quantity -= amount;
         }
     }
-}
+

@@ -2,121 +2,190 @@
 
 public class AccountRepository(DbContext dbContext) : IAccountRepository
 {
-    private DbContext _DbContext { get; } = dbContext;
+    private readonly DbContext dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
 
     public void Create(Account account)
     {
-        if (_DbContext == null || _DbContext.accounts == null)
-        {
-            throw new InvalidOperationException("DbContext or accounts collection is not initialized.");
-        }
-
-        var existingAccount = _DbContext.accounts.FirstOrDefault(a => a.Name == account.Name);
-        if (existingAccount != null)
-        {
-            throw new Exception("An account with this username already exists.");
-        }
-
-        _DbContext.accounts.Add(account);
+        dbContext.accounts.Add(account);
     }
 
     public Account ReadById(int id)
     {
-        var account = _DbContext.accounts.FirstOrDefault(p => p.Id == id);
-        return account;
+        return dbContext.accounts.FirstOrDefault(p => p.Id == id);
     }
 
     public List<Account> ReadAll()
     {
-        return _DbContext.accounts;
+        return dbContext.accounts;
     }
 
     public Account ReadByUsername(string username)
     {
-        return _DbContext.accounts.FirstOrDefault(acc => acc.Name.Equals(username, StringComparison.OrdinalIgnoreCase));
+        return dbContext.accounts.FirstOrDefault(acc => acc.Name.Equals(username, StringComparison.OrdinalIgnoreCase));
     }
 
     public void Update(Account updatedAccount)
     {
-        var account = _DbContext.accounts.FirstOrDefault(a => a.Id == updatedAccount.Id);
-
+        var account = ReadById(updatedAccount.Id);
         if (account != null)
         {
             account.Name = updatedAccount.Name;
-        }
-        else
-        {
-            throw new ArgumentException("Account not found.");
         }
     }
 
     public void Delete(int id)
     {
-        var account = _DbContext.accounts.FirstOrDefault(p => p.Id == id);
+        var account = ReadById(id);
         if (account != null)
         {
-            _DbContext.accounts.Remove(account);
-        }
-        else
-        {
-            throw new ArgumentException("Account not found.");
+            dbContext.accounts.Remove(account);
         }
     }
+}
 
-    public void AddToCart(Account account, int productId, int quantity)
+public class AccountService(IAccountRepository accountRepository) : IAccountService
+{
+    private readonly IAccountRepository _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
+
+    public void Create(Account account)
     {
-        if (dbContext?.products == null)
-        {
-            Console.WriteLine("Database context or products list is not initialized.");
-            return;
-        }
-
-        var product = dbContext.products.FirstOrDefault(p => p.id == productId);
-
-        if (product == null)
-        {
-            Console.WriteLine("Product not found.");
-            return;
-        }
-
         if (account == null)
         {
-            Console.WriteLine("Account is not initialized.");
-            return;
+            throw new ArgumentNullException(nameof(account), "Account cannot be null.");
         }
 
-        if (account.Cart == null)
+        if (string.IsNullOrWhiteSpace(account.Name))
         {
-            account.Cart = new Cart(new List<CartItem>());
+            throw new ArgumentException("Account name cannot be empty or whitespace.", nameof(account.Name));
         }
 
-        if (quantity <= 0)
+        var existingAccount = _accountRepository.ReadByUsername(account.Name);
+        if (existingAccount != null)
         {
-            Console.WriteLine("Quantity must be greater than zero.");
-            return;
+            throw new InvalidOperationException("An account with this username already exists.");
         }
 
-        var existingCartItem = account.Cart.Products.FirstOrDefault(item => item?.Product?.id == product.id);
+        _accountRepository.Create(account);
+    }
 
-        if (existingCartItem != null)
+    public Account ReadById(int id)
+    {
+        if (id <= 0)
         {
-            existingCartItem.IncreaseQuantity(quantity);
-            Console.WriteLine($"Updated {product.name} quantity to {existingCartItem}.");
+            throw new ArgumentOutOfRangeException(nameof(id), "ID must be a positive integer.");
         }
-        else
+
+        var account = _accountRepository.ReadById(id);
+        if (account == null)
         {
-            account.Cart.AddToCart(product, quantity);
-            Console.WriteLine($"Added {product.name} to your cart. Quantity: {quantity}.");
+            throw new KeyNotFoundException("Account not found.");
         }
+
+        return account;
+    }
+
+    public Account ReadByUserName(string username)
+    {
+        if (string.IsNullOrWhiteSpace(username))
+        {
+            throw new ArgumentException("Username cannot be null or whitespace.", nameof(username));
+        }
+
+        var account = _accountRepository.ReadByUsername(username);
+        if (account == null)
+        {
+            throw new KeyNotFoundException("Account with the specified username not found.");
+        }
+
+        return account;
+    }
+
+    public List<Account> ReadAll()
+    {
+        var accounts = _accountRepository.ReadAll();
+        if (accounts == null || accounts.Count == 0)
+        {
+            throw new InvalidOperationException("No accounts found.");
+        }
+
+        return accounts;
+    }
+
+    public void Update(Account account)
+    {
+        if (account == null)
+        {
+            throw new ArgumentNullException(nameof(account), "Account cannot be null.");
+        }
+
+        if (string.IsNullOrWhiteSpace(account.Name))
+        {
+            throw new ArgumentException("Account name cannot be empty or whitespace.", nameof(account.Name));
+        }
+
+        var existingAccount = _accountRepository.ReadById(account.Id);
+        if (existingAccount == null)
+        {
+            throw new KeyNotFoundException("Account not found.");
+        }
+
+        _accountRepository.Update(account);
+    }
+
+    public void Delete(int id)
+    {
+        if (id <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(id), "ID must be a positive integer.");
+        }
+
+        var account = _accountRepository.ReadById(id);
+        if (account == null)
+        {
+            throw new KeyNotFoundException("Account not found.");
+        }
+
+        _accountRepository.Delete(id);
     }
 
     public CartItem GetCartItem(Account account, int productId)
     {
-        return account.Cart.Products.FirstOrDefault(item => item?.Product?.id == productId);
+        if (account == null)
+        {
+            throw new ArgumentNullException(nameof(account), "Account cannot be null.");
+        }
+
+        if (productId <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(productId), "Product ID must be a positive integer.");
+        }
+
+        var cartItem = account.Cart?.Products?.FirstOrDefault(item => item?.Product?.id == productId);
+        if (cartItem == null)
+        {
+            throw new KeyNotFoundException("Cart item not found.");
+        }
+
+        return cartItem;
     }
 
     public void ReduceCartItemQuantity(Account account, int productId, int quantity)
     {
+        if (account == null)
+        {
+            throw new ArgumentNullException(nameof(account), "Account cannot be null.");
+        }
+
+        if (productId <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(productId), "Product ID must be a positive integer.");
+        }
+
+        if (quantity <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(quantity), "Quantity must be a positive integer.");
+        }
+
         var cartItem = GetCartItem(account, productId);
         if (cartItem != null)
         {
@@ -127,8 +196,19 @@ public class AccountRepository(DbContext dbContext) : IAccountRepository
             }
         }
     }
+
     public void RemoveFromCart(Account account, int productId)
     {
+        if (account == null)
+        {
+            throw new ArgumentNullException(nameof(account), "Account cannot be null.");
+        }
+
+        if (productId <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(productId), "Product ID must be a positive integer.");
+        }
+
         var cartItem = GetCartItem(account, productId);
         if (cartItem != null)
         {
@@ -136,57 +216,3 @@ public class AccountRepository(DbContext dbContext) : IAccountRepository
         }
     }
 }
-
-public class AccountService(AccountRepository accountRepository) : IAccountService
-    {
-        private AccountRepository _accountRepository = accountRepository;
-
-        public void Create(Account account)
-        {
-            _accountRepository.Create(account);
-        }
-
-        public Account ReadById(int id)
-        {
-            return _accountRepository.ReadById(id);
-        }
-
-        public Account ReadByUserName(string username)
-        {
-            return _accountRepository.ReadByUsername(username);
-        }
-
-        public List<Account> ReadAll()
-        {
-            return _accountRepository.ReadAll();
-        }
-
-        public void Update(Account account)
-        {
-            _accountRepository.Update(account);
-        }
-
-        public void Delete(int id)
-        {
-            _accountRepository.Delete(id);
-        }
-
-        public void AddToCart(Account account, int productId, int quantity)
-        {
-            _accountRepository.AddToCart(account, productId, quantity);
-        }
-
-        public CartItem GetCartItem(Account account, int productId)
-        {
-            return account.Cart.Products.FirstOrDefault(item => item?.Product?.id == productId);
-        }
-        public void ReduceCartItemQuantity(Account account, int productId, int quantity)
-        {
-            _accountRepository.ReduceCartItemQuantity(account, productId, quantity);
-        }
-
-        public void RemoveFromCart(Account account, int productId)
-        {
-            _accountRepository.RemoveFromCart(account, productId);
-        }
-    }

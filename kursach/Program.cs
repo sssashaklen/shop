@@ -51,7 +51,6 @@ public class Program
 
     private static void ShowMenu(Dictionary<string, ICommand> commands)
     {
-            
         Console.WriteLine("\nChoose an option:");
         foreach (var entry in commands)
         {

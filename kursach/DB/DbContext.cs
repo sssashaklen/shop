@@ -2,9 +2,9 @@
 {
     public class DbContext
     {
-        public List<Account> accounts = new List<Account>();
-        public List<Product> products = new List<Product>();
-        public List<Order> orders = new List<Order>();
+        public List<Account> accounts = new ();
+        public List<Product> products = new ();
+        public List<Order> orders = new ();
         
         public void Seed()
         {
@@ -15,7 +15,7 @@
             products.Add(new Product( "Keyboard", "A mechanical keyboard with RGB lighting and programmable keys.", 50, 100));
             products.Add(new Product( "Mouse", "An ergonomic wireless mouse with a high-precision sensor.", 30, 200));
             accounts.Add(new AdminAccount("Oleksandra",100000, "kozachenko.oleksandra@lll.kpi.ua","admin", new Cart(new List<CartItem>())));
-            accounts.Add(new UserAccount("sasa",100000, "kozachenko.oleksandra@lll.kpi.ua","admin", new Cart(new List<CartItem>())));
+            accounts.Add(new UserAccount("sasha",100000, "kozachenko.oleksandra@lll.kpi.ua","admin", new Cart(new List<CartItem>())));
         }
     }
 }

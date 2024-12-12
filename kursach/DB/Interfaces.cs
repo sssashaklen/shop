@@ -15,7 +15,8 @@ public interface IOrderRepository
     void Create(Order order);
     Order ReadById(int id); 
     List<Order> ReadAll();
-    void Delete(int id);
+    void Delete(Order order);
+    List<Order> GetOrderByAccountId(int accountId);
 }
 public interface IAccountService
 {
@@ -31,7 +32,6 @@ public interface IOrderService
     void Create(Order order);
     Order ReadById(int id); 
     List<Order> ReadAll();
-
     void Delete(int id);
 }
 
@@ -41,7 +41,8 @@ public interface IProductRepository
     Product ReadById(int id);
     List<Product> ReadAll();
     void Update(Product product);
-    void Delete(int id);
+    void Delete(Product product);
+    void DecreaseQuantity(Product product, int quantityToDecrease);
 }
 
 public interface IProductService

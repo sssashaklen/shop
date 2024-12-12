@@ -27,7 +27,7 @@ public class UserAccount : Account
             { "1", new AddBalanceCommand() },
             { "2", new CheckBalanceCommand()},
             { "3", new ViewProductsCommand(productService) },
-            { "4", new AddProductToCartCommand(productService, accountService) },
+            { "4", new AddProductToCartCommand(productService) },
             { "5", new DeleteProductFromCartCommand(accountService)},
             { "6", new ViewCartCommand() },
             { "7", new CreateOrderCommand(orderService, productService) },

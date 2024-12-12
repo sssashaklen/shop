@@ -62,7 +62,7 @@ public class ViewProductsCommand(ProductService productService) : ICommand
     }
 }
 
-public class AddProductToCartCommand(ProductService productService, AccountService accountService) : ICommand
+public class AddProductToCartCommand(ProductService productService) : ICommand
 {
     public void Execute()
     {
@@ -76,8 +76,9 @@ public class AddProductToCartCommand(ProductService productService, AccountServi
                     Console.WriteLine("Enter the quantity to add: ");
                     if (int.TryParse(Console.ReadLine(), out int quantity) && quantity > 0 &&
                         quantity <= product.quantity)
-                    {
-                        accountService.AddToCart(account, productId, quantity);
+                    { 
+                        account.Cart.AddToCart(product, quantity);
+                        Console.WriteLine($"{product.name} successfully added to your cart.");
                     }
                     else if (quantity > product.quantity)
                     {
