@@ -1,113 +1,77 @@
 ﻿namespace shop.DB;
 
-
-    public class OrderRepository(DbContext dbContext) : IOrderRepository
-    {
-        private readonly DbContext _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-
-        public void Create(Order order)
-        {
-            _dbContext.orders.Add(order);
-        }
-
-        public Order ReadById(int id)
-        {
-            return _dbContext.orders.FirstOrDefault(g => g.OrderId == id);
-        }
-
-        public List<Order> ReadAll()
-        {
-            return _dbContext.orders.ToList();
-        }
-        
-        public void Delete(Order order)
-        {
-            _dbContext.orders.Remove(order);
-        }
-
-
-        public List<Order> GetOrderByAccountId(int accountId)
-        {
-            return _dbContext.orders.Where(order => order.CustomerId == accountId).ToList();
-        }
-    }
+public class OrderRepository(DbContext dbContext) : IOrderRepository
+{
+    private DbContext DbContext => dbContext;
     
-    public class OrderService(IOrderRepository orderRepository) : IOrderService
+    public void Create(Order order)
     {
-        private readonly IOrderRepository _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
-
-        public void Create(Order order)
-        {
-            if (order == null)
-            {
-                throw new ArgumentNullException(nameof(order), "Order cannot be null.");
-            }
-
-            if (order.CustomerId <= 0)
-            {
-                throw new ArgumentException("Customer ID must be a positive integer.", nameof(order.CustomerId));
-            }
-
-            _orderRepository.Create(order);
-        }
-
-        public Order ReadById(int id)
-        {
-            if (id <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(id), "Order ID must be a positive integer.");
-            }
-
-            var order = _orderRepository.ReadById(id);
-            if (order == null)
-            {
-                throw new KeyNotFoundException("Order not found.");
-            }
-
-            return order;
-        }
-
-        public List<Order> ReadAll()
-        {
-            var orders = _orderRepository.ReadAll();
-            if (orders == null || !orders.Any())
-            {
-                throw new InvalidOperationException("No orders found.");
-            }
-
-            return orders;
-        }
-        
-        public void Delete(int id)
-        {
-            if (id <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(id), "Order ID must be a positive integer.");
-            }
-
-            var order = _orderRepository.ReadById(id);
-            if (order == null)
-            {
-                throw new KeyNotFoundException("Order not found.");
-            }
-
-            _orderRepository.Delete(order);
-        }
-        
-        public List<Order> GetOrdersByAccountId(int accountId)
-        {
-            if (accountId <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(accountId), "Account ID must be a positive integer.");
-            }
-
-            var orders = _orderRepository.GetOrderByAccountId(accountId);
-            if (orders == null || !orders.Any())
-            {
-                throw new InvalidOperationException("No orders found for this account.");
-            }
-
-            return orders;
-        }
+        DbContext.orders.Add(order);
     }
 
+    public Order ReadById(int id)
+    {
+        return DbContext.orders.FirstOrDefault(g => g.OrderId.Equals(id));
+    }
+
+    public List<Order> ReadAll()
+    {
+        return DbContext.orders.Count == 0 ? null : DbContext.orders;
+    }
+
+    public void Update(Order order)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Delete(int id)
+    {
+        var orders = ReadAll();
+        var order = orders.FirstOrDefault();
+
+        if (order != null)
+        {
+            DbContext.orders.Remove(order);
+        }
+        else
+        {
+            throw new ArgumentException("Game not found.");
+        }
+    }
+    public List<Order> GetOrdersByAccountId(int accountId)
+    {
+        return DbContext.orders.Where(order => order.CustomerId == accountId).ToList();
+    }
+}
+
+public class OrderService(OrderRepository orderRepository) : IOrderService
+{
+    public void Create(Order order)
+    {
+        orderRepository.Create(order);
+    }
+
+    public Order ReadById(int id)
+    {
+        return orderRepository.ReadById(id);
+    }
+
+    public List<Order> ReadAll()
+    {
+        return orderRepository.ReadAll();
+    }
+
+    public void Update(Order order)
+    {
+       orderRepository.Update(order);
+    }
+
+    public void Delete(int id)
+    {
+        orderRepository.Delete(id);
+    }
+    public List<Order> GetOrdersByAccountId(int accountId)
+    {
+        return orderRepository.GetOrdersByAccountId(accountId);
+    }
+}
