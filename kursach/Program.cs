@@ -40,8 +40,7 @@ public class Program
             }
             else
             {
-                Dictionary<string, ICommand> commands =
-                    currentAccount.CreateCommands(productService, accountService, orderService);
+                Dictionary<string, ICommand> commands = CommandFactory.CreateCommands(currentAccount, accountService, orderService, productService);
                 ShowMenu(commands);
 
                 Account tempAccount = UserManager.GetCurrentAccount();

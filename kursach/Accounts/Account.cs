@@ -13,8 +13,7 @@ public abstract class Account
     private static int _globalId=1;
     
    public Cart Cart { get; set; } 
-   public abstract Dictionary<string, ICommand> Commands { get; protected set; }
-
+   
    protected Account(string name, int balance, string email, string password, Cart? cart = null)
    {
        Id = _globalId++;
@@ -24,10 +23,5 @@ public abstract class Account
        Password = password;
        Cart = cart ?? new Cart(new List<CartItem>());
    }
-
-
-   public abstract Dictionary<string, ICommand> CreateCommands(
-       ProductService productService,
-       AccountService accountService,
-       OrderService orderService);
+   
 }
