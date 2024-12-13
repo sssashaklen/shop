@@ -1,14 +1,14 @@
 ﻿
+using kursach;
 using shop;
 using shop.commands;
 using shop.DB;
 
 public class Program
 {
-    public static Account currentAccount; 
-
     public static void Main(string[] args)
     {
+        UserManager userManager = new UserManager();
         DbContext db = new DbContext();
         db.Seed();
         AccountRepository accountRepository = new AccountRepository(db);
@@ -29,21 +29,29 @@ public class Program
         Console.WriteLine("Welcome to the Shop Application!");
         Console.WriteLine("Please log in or register to continue.");
 
-        while (true) 
+        Account currentAccount = null;
+
+        while (true)
         {
             if (currentAccount == null)
             {
                 ShowMenu(commandUnlogged);
+                currentAccount = UserManager.GetCurrentAccount();
             }
             else
             {
-                Dictionary<string, ICommand> commands = currentAccount.CreateCommands(productService, accountService, orderService);
-                
-                ShowMenu(commands); 
-                
-                if (currentAccount == null)
+                Dictionary<string, ICommand> commands =
+                    currentAccount.CreateCommands(productService, accountService, orderService);
+                ShowMenu(commands);
+
+                Account tempAccount = UserManager.GetCurrentAccount();
+                if (tempAccount == null)
                 {
-                    Console.WriteLine("You have logged out.");
+                    currentAccount = null;
+                }
+                else
+                {
+                    currentAccount = tempAccount;
                 }
             }
         }

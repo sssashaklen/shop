@@ -1,4 +1,6 @@
 ﻿
+using kursach;
+
 namespace shop.commands;
 
 public interface ICommand
@@ -6,11 +8,12 @@ public interface ICommand
     void Execute();
     string ShowInfo();
 }
-public class LogoutCommand : ICommand
+public class LogoutCommand: ICommand
 {
     public void Execute()
     {
-        Program.currentAccount = null;  
+        Account currentAccount = null;
+        UserManager.Login(currentAccount);
     }
 
     public string ShowInfo()

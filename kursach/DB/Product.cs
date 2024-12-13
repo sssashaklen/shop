@@ -1,13 +1,8 @@
 ﻿namespace shop.DB;
 
-public class ProductRepository : IProductRepository
+public class ProductRepository(DbContext dbContext) : IProductRepository
 {
-    private readonly DbContext _dbContext;
-
-    public ProductRepository(DbContext dbContext)
-    {
-        _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-    }
+    private readonly DbContext _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
 
     public void Create(Product product)
     {

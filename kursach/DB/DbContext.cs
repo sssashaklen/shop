@@ -14,8 +14,6 @@
             products.Add(new Product( "Smart Watch", "A smart watch with fitness tracking and heart rate monitor.", 150, 30));
             products.Add(new Product( "Keyboard", "A mechanical keyboard with RGB lighting and programmable keys.", 50, 100));
             products.Add(new Product( "Mouse", "An ergonomic wireless mouse with a high-precision sensor.", 30, 200));
-            accounts.Add(new AdminAccount("Oleksandra",100000, "kozachenko.oleksandra@lll.kpi.ua","admin", new Cart(new List<CartItem>())));
-            accounts.Add(new UserAccount("sasha",100000, "kozachenko.oleksandra@lll.kpi.ua","admin", new Cart(new List<CartItem>())));
         }
     }
 }

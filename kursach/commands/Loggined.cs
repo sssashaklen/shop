@@ -1,4 +1,5 @@
-﻿using shop.DB;
+﻿using kursach;
+using shop.DB;
 
 namespace shop.commands;
 
@@ -7,7 +8,7 @@ public class AddBalanceCommand : ICommand
 {
     public void Execute()
     {
-        Account account = Program.currentAccount;
+        var account = UserManager.GetCurrentAccount();
         Console.WriteLine("Enter the amount to add to your balance: ");
         if (int.TryParse(Console.ReadLine(), out int amount) && amount > 0)
         {
@@ -30,7 +31,7 @@ public class CheckBalanceCommand : ICommand
 {
     public void Execute()
     {
-        Account account = Program.currentAccount;
+        var account = UserManager.GetCurrentAccount();
         Console.WriteLine($"Your current balance is: {account.Balance} ");
     }
 
@@ -69,7 +70,7 @@ public class AddProductToCartCommand(ProductService productService) : ICommand
         Console.WriteLine("Enter the ID of the product to add to your cart: ");
         if (int.TryParse(Console.ReadLine(), out int productId))
         {
-            Account account = Program.currentAccount;
+            var account = UserManager.GetCurrentAccount();
             var product = productService.ReadById(productId);
                 if (productId != null)
                 {
@@ -115,7 +116,7 @@ public class DeleteProductFromCartCommand(AccountService accountService)
         
         if (int.TryParse(Console.ReadLine(), out int productId))
         {
-            Account account = Program.currentAccount;
+            var account = UserManager.GetCurrentAccount();
             var cartItem = accountService.GetCartItem(account, productId);
             
             if (cartItem != null)
@@ -161,11 +162,11 @@ public class DeleteProductFromCartCommand(AccountService accountService)
         return "Delete or reduce product quantity from cart.";
     }
 }
-public class ViewCartCommand() : ICommand
+public class ViewCartCommand: ICommand
 {
     public void Execute()
     {
-        var account = Program.currentAccount;
+        var account = UserManager.GetCurrentAccount();
         var currentCart = account.Cart;
         
         if (currentCart == null || currentCart.Products == null || currentCart.Products.Count == 0)
@@ -193,9 +194,9 @@ public class ViewCartCommand() : ICommand
 
 public class ViewOrderHistoryCommand(OrderService orderService) : ICommand
 {
-    private readonly Account _account = Program.currentAccount;
     public void Execute()
     {
+        var _account = UserManager.GetCurrentAccount();
         Console.Clear();
         var orders = orderService.GetOrdersByAccountId(_account.Id);
         if (orders.Count == 0)
@@ -230,7 +231,7 @@ public class CreateOrderCommand(OrderService orderService, ProductService produc
 {
     public void Execute()
     {
-        var account = Program.currentAccount;
+        var account = UserManager.GetCurrentAccount();
         var cart = account.Cart;
         Order order = new Order(account.Id, cart);
         var balance = account.Balance;
