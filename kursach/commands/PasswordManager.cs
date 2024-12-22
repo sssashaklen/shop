@@ -74,8 +74,7 @@ public static class SecurePasswordHasher
 
         // Convert to base64
         string base64Hash = Convert.ToBase64String(hashBytes);
-
-        // Format hash with extra information
+        
         return $"$HASH|V1${iterations}${base64Hash}";
     }
 

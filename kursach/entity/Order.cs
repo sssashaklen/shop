@@ -8,7 +8,7 @@
         public int CustomerId { get; private set; }
         public string OrderDate { get; private set; } 
         public string OrderTime { get; private set; }
-        public float OrderPrice { get; private set; }
+        public int OrderPrice { get; private set; }
         public List <CartItem> Products { get; private set; }
         
         public Order(int customerId, Cart cart)

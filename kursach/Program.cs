@@ -18,14 +18,7 @@ public class Program
         AccountService accountService = new AccountService(accountRepository);
         ProductService productService = new ProductService(productRepository);
         OrderService orderService = new OrderService(orderRepository);
-
-        var commandUnlogged = new Dictionary<string, ICommand>
-        {
-            { "1", new CommandRegister(accountService) },
-            { "2", new LoginCommand(accountService) },
-            { "3", new ExitCommand() }
-        };
-
+        
         Console.WriteLine("Welcome to the Shop Application!");
         Console.WriteLine("Please log in or register to continue.");
 
@@ -33,25 +26,15 @@ public class Program
 
         while (true)
         {
+            var commands = CommandFactory.CreateCommands(currentAccount, accountService, orderService, productService);
+            
+            ShowMenu(commands);
+            
+            currentAccount = UserManager.GetCurrentAccount();
+    
             if (currentAccount == null)
             {
-                ShowMenu(commandUnlogged);
-                currentAccount = UserManager.GetCurrentAccount();
-            }
-            else
-            {
-                Dictionary<string, ICommand> commands = CommandFactory.CreateCommands(currentAccount, accountService, orderService, productService);
-                ShowMenu(commands);
-
-                Account tempAccount = UserManager.GetCurrentAccount();
-                if (tempAccount == null)
-                {
-                    currentAccount = null;
-                }
-                else
-                {
-                    currentAccount = tempAccount;
-                }
+                Console.WriteLine("You have been logged out. Please log in or register to continue.");
             }
         }
     }

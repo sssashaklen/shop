@@ -24,7 +24,7 @@ public class AddBalanceCommand : ICommand
     public string ShowInfo()
     {
         return "Add Balance";
-    }
+    } 
 }
 
 public class CheckBalanceCommand : ICommand
@@ -32,7 +32,36 @@ public class CheckBalanceCommand : ICommand
     public void Execute()
     {
         var account = UserManager.GetCurrentAccount();
-        Console.WriteLine($"Your current balance is: {account.Balance} ");
+        Console.WriteLine($"Your current balance is: {account.Balance}");
+
+        // Додаткові дії після перевірки балансу
+        var commands = new Dictionary<string, ICommand>
+        {
+            { "1", new AddBalanceCommand() }
+        };
+
+        Console.WriteLine("Would you like to add balance?");
+        foreach (var entry in commands)
+        {
+            Console.WriteLine($"{entry.Key}. {entry.Value.ShowInfo()}");
+        }
+
+        string input = Console.ReadLine();
+        if (commands.TryGetValue(input, out ICommand command))
+        {
+            try
+            {
+                command.Execute();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+            }
+        }
+        else
+        {
+            Console.WriteLine("Returning to main menu.");
+        }
     }
 
     public string ShowInfo()
@@ -40,7 +69,8 @@ public class CheckBalanceCommand : ICommand
         return "Check Balance";
     }
 }
-public class ViewProductsCommand(ProductService productService) : ICommand
+
+public class ViewProductsCommand(IProductService productService) : ICommand
 {
     public void Execute()
     {
@@ -55,6 +85,35 @@ public class ViewProductsCommand(ProductService productService) : ICommand
         {
             Console.WriteLine($"ID: {product.id} | Name: {product.name} | Price: {product.price} | Quantity: {product.quantity} | Description: {product.description}");
         }
+        
+        var commands = new Dictionary<string, ICommand>
+        {
+            { "1", new AddProductToCartCommand(productService) },
+        };
+
+
+        Console.WriteLine("Would you like to add products?:");
+        foreach (var entry in commands)
+        {
+            Console.WriteLine($"{entry.Key}. {entry.Value.ShowInfo()}");
+        }
+        
+        string input = Console.ReadLine();
+        if (commands.TryGetValue(input, out ICommand command))
+        {
+            try
+            {
+                command.Execute();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+            }
+        }
+        else
+        {
+            Console.WriteLine("Invalid option, please try again.");
+        }
     }
 
     public string ShowInfo()
@@ -63,7 +122,7 @@ public class ViewProductsCommand(ProductService productService) : ICommand
     }
 }
 
-public class AddProductToCartCommand(ProductService productService) : ICommand
+public class AddProductToCartCommand(IProductService productService) : ICommand
 {
     public void Execute()
     {
@@ -107,48 +166,35 @@ public class AddProductToCartCommand(ProductService productService) : ICommand
     }
 }
 
-public class DeleteProductFromCartCommand(AccountService accountService)
+public class DeleteProductFromCartCommand(IAccountService accountService)
     : ICommand
 {
     public void Execute()
     {
         Console.WriteLine("Enter the ID of the product to remove from your cart: ");
-        
+    
         if (int.TryParse(Console.ReadLine(), out int productId))
         {
             var account = UserManager.GetCurrentAccount();
-            var cartItem = accountService.GetCartItem(account, productId);
             
-            if (cartItem != null)
+            Console.WriteLine($"Current quantity of this product in your cart: {accountService.GetCartItemQuantity(account, productId)}");
+            Console.WriteLine("Enter the quantity to remove: ");
+        
+            if (int.TryParse(Console.ReadLine(), out int quantity) && quantity > 0)
             {
-                Console.WriteLine($"Current quantity of this product in your cart: {cartItem.Quantity}");
-                Console.WriteLine("Enter the quantity to remove: ");
-                
-                if (int.TryParse(Console.ReadLine(), out int quantity) && quantity > 0)
+                try
                 {
-                    if (quantity < cartItem.Quantity)
-                    {
-                        accountService.ReduceCartItemQuantity(account, productId, quantity);
-                        Console.WriteLine($"Removed {quantity} units of product ID {productId} from your cart.");
-                    }
-                    else if (quantity == cartItem.Quantity)
-                    {
-                        accountService.RemoveFromCart(account, productId);
-                        Console.WriteLine($"Product ID {productId} has been fully removed from your cart.");
-                    }
-                    else
-                    {
-                        Console.WriteLine("You can't remove more than the available quantity in your cart.");
-                    }
+                    accountService. ReduceCartItemQuantity(account, productId, quantity);
+                    Console.WriteLine($"Successfully removed {quantity} units of product ID {productId} from your cart.");
                 }
-                else
+                catch (InvalidOperationException ex)
                 {
-                    Console.WriteLine("Invalid quantity entered.");
+                    Console.WriteLine(ex.Message);
                 }
             }
             else
             {
-                Console.WriteLine("Product not found in your cart.");
+                Console.WriteLine("Invalid quantity entered.");
             }
         }
         else
@@ -157,24 +203,27 @@ public class DeleteProductFromCartCommand(AccountService accountService)
         }
     }
 
+
     public string ShowInfo()
     {
         return "Delete or reduce product quantity from cart.";
     }
 }
-public class ViewCartCommand: ICommand
+
+
+public class ViewCartCommand(IProductService productService, IAccountService accountService, IOrderService orderService): ICommand
 {
     public void Execute()
     {
         var account = UserManager.GetCurrentAccount();
         var currentCart = account.Cart;
-        
+
         if (currentCart == null || currentCart.Products == null || currentCart.Products.Count == 0)
         {
             Console.WriteLine("Your cart is empty.");
             return;
         }
-        
+
         Console.WriteLine("Products in your cart:");
         float totalPrice = 0;
         foreach (var cartItem in currentCart.Products)
@@ -184,6 +233,36 @@ public class ViewCartCommand: ICommand
             totalPrice += price;
         }
         Console.WriteLine($"Total price: {totalPrice}");
+
+        // Додаткові дії після перегляду кошика
+        var commands = new Dictionary<string, ICommand>
+        {
+            { "1", new DeleteProductFromCartCommand(accountService) },
+            { "2", new CreateOrderCommand(orderService, productService) }
+        };
+
+        Console.WriteLine("Choose an action:");
+        foreach (var entry in commands)
+        {
+            Console.WriteLine($"{entry.Key}. {entry.Value.ShowInfo()}");
+        }
+
+        string input = Console.ReadLine();
+        if (commands.TryGetValue(input, out ICommand command))
+        {
+            try
+            {
+                command.Execute();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+            }
+        }
+        else
+        {
+            Console.WriteLine("Invalid option, returning to main menu.");
+        }
     }
 
     public string ShowInfo()
@@ -192,7 +271,8 @@ public class ViewCartCommand: ICommand
     }
 }
 
-public class ViewOrderHistoryCommand(OrderService orderService) : ICommand
+
+public class ViewOrderHistoryCommand(IOrderService orderService) : ICommand
 {
     public void Execute()
     {
@@ -227,7 +307,7 @@ public class ViewOrderHistoryCommand(OrderService orderService) : ICommand
     }
 }
 
-public class CreateOrderCommand(OrderService orderService, ProductService productService) : ICommand
+public class CreateOrderCommand(IOrderService orderService, IProductService productService) : ICommand
 {
     public void Execute()
     {

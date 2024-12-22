@@ -4,7 +4,7 @@ using shop.DB;
 
 namespace shop.commands;
 
-public class CommandRegister(AccountService accountService) : ICommand
+public class CommandRegister(IAccountService accountService) : ICommand
 {
     public void Execute()
     {
@@ -109,7 +109,7 @@ public class CommandRegister(AccountService accountService) : ICommand
 
 
 
-public class LoginCommand(AccountService accountService) : ICommand
+public class LoginCommand(IAccountService accountService) : ICommand
 {
     public void Execute()
     {

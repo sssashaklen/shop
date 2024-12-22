@@ -27,19 +27,18 @@ public class AccountRepository(DbContext dbContext) : IAccountRepository
     public void Update(Account updatedAccount)
     {
         var account = ReadById(updatedAccount.Id);
-        if (account != null)
-        {
-            account.Name = updatedAccount.Name;
-        }
+        account.Name = updatedAccount.Name;
     }
 
     public void Delete(int id)
     {
         var account = ReadById(id);
-        if (account != null)
-        {
-            dbContext.accounts.Remove(account);
-        }
+        dbContext.accounts.Remove(account);
+    }
+    public CartItem GetCartItem(Account account, int productId)
+    {
+        var cartItem = account.Cart.Products.FirstOrDefault(item => item.Product.id == productId);
+        return cartItem;
     }
 }
 
@@ -148,25 +147,14 @@ public class AccountService(IAccountRepository accountRepository) : IAccountServ
         _accountRepository.Delete(id);
     }
 
-    public CartItem GetCartItem(Account account, int productId)
+    public int GetCartItemQuantity(Account account, int productId)
     {
-        if (account == null)
+        var cartItem = accountRepository.GetCartItem(account, productId);
+        if (cartItem != null)
         {
-            throw new ArgumentNullException(nameof(account), "Account cannot be null.");
+            return cartItem.Quantity;
         }
-
-        if (productId <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(productId), "Product ID must be a positive integer.");
-        }
-
-        var cartItem = account.Cart?.Products?.FirstOrDefault(item => item?.Product?.id == productId);
-        if (cartItem == null)
-        {
-            throw new KeyNotFoundException("Cart item not found.");
-        }
-
-        return cartItem;
+        throw new InvalidOperationException("Product not found in the cart.");
     }
 
     public void ReduceCartItemQuantity(Account account, int productId, int quantity)
@@ -186,7 +174,7 @@ public class AccountService(IAccountRepository accountRepository) : IAccountServ
             throw new ArgumentOutOfRangeException(nameof(quantity), "Quantity must be a positive integer.");
         }
 
-        var cartItem = GetCartItem(account, productId);
+        var cartItem = _accountRepository.GetCartItem(account, productId);
         if (cartItem != null)
         {
             cartItem.DecreaseQuantity(quantity);
@@ -209,7 +197,7 @@ public class AccountService(IAccountRepository accountRepository) : IAccountServ
             throw new ArgumentOutOfRangeException(nameof(productId), "Product ID must be a positive integer.");
         }
 
-        var cartItem = GetCartItem(account, productId);
+        var cartItem = _accountRepository.GetCartItem(account, productId);
         if (cartItem != null)
         {
             account.Cart.Products.Remove(cartItem);
