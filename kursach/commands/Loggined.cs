@@ -177,6 +177,7 @@ public class DeleteProductFromCartCommand(IAccountService accountService)
         if (int.TryParse(Console.ReadLine(), out int productId))
         {
             var account = UserManager.GetCurrentAccount();
+            var cart = account.Cart;
             
             Console.WriteLine($"Current quantity of this product in your cart: {accountService.GetCartItemQuantity(account, productId)}");
             Console.WriteLine("Enter the quantity to remove: ");
@@ -185,8 +186,9 @@ public class DeleteProductFromCartCommand(IAccountService accountService)
             {
                 try
                 {
-                    accountService. ReduceCartItemQuantity(account, productId, quantity);
+                    accountService.ReduceCartItemQuantity(account, productId, quantity);
                     Console.WriteLine($"Successfully removed {quantity} units of product ID {productId} from your cart.");
+                    
                 }
                 catch (InvalidOperationException ex)
                 {
