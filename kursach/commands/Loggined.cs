@@ -1,5 +1,4 @@
-﻿using System.Text;
-using kursach;
+﻿using kursach;
 using shop.DB;
 
 namespace shop.commands;
@@ -228,11 +227,14 @@ public class ViewCartCommand(IProductService productService, IAccountService acc
         }
 
         Console.WriteLine("Products in your cart:");
+        float totalPrice = 0;
         foreach (var cartItem in currentCart.Products)
         {
-            Console.WriteLine($"Product: {cartItem.Product.name} | Price: {cartItem.Product.price} | Quantity: {cartItem.Quantity}");
+            var price = cartItem.Product.price * cartItem.Quantity;
+            Console.WriteLine($"Product: {cartItem.Product.name} | Price: {price} | Quantity: {cartItem.Quantity}");
+            totalPrice += price;
         }
-        Console.WriteLine($"Total price: {currentCart.totalPrice}");
+        Console.WriteLine($"Total price: {totalPrice}");
 
         // Додаткові дії після перегляду кошика
         var commands = new Dictionary<string, ICommand>
@@ -284,17 +286,20 @@ public class ViewOrderHistoryCommand(IOrderService orderService) : ICommand
             Console.WriteLine("You have no order history.");
             return;
         }
-        
+
+        float totalPrice = 0;
         Console.WriteLine("Order history:");
         foreach (var order in orders)
         {
             Console.WriteLine($"Order ID: {order.OrderId} | Date: {order.OrderDate} | Time : {order.OrderTime}");
             foreach (var item in order.Products)
             {
+                var price = item.Product.price * item.Quantity;
                 Console.WriteLine($"  - Product: {item.Product.name} | Price: {item.Product.price}");
                 
+                totalPrice += price;
             }
-            Console.WriteLine($"  - Total price: {order.OrderPrice}");
+            Console.WriteLine($"  - Total price: {totalPrice}");
         }
     }
 
@@ -310,11 +315,11 @@ public class CreateOrderCommand(IOrderService orderService, IProductService prod
     {
         var account = UserManager.GetCurrentAccount();
         var cart = account.Cart;
-        var totalPrice = cart.totalPrice;
+        Order order = new Order(account.Id, cart);
         var balance = account.Balance;
-        if (totalPrice <= balance)
+        if (order.OrderPrice <= balance)
         {
-            var order = orderService.Create(account);
+            orderService.Create(order);
             Console.WriteLine("Order created successfully.");
             Console.WriteLine($"Price: {order.OrderPrice}");
             foreach( var productItem in cart.Products)
@@ -323,6 +328,7 @@ public class CreateOrderCommand(IOrderService orderService, IProductService prod
                 var productItemQuantity = productItem.Quantity;
                 productService.DecreaseQuantity(productId, productItemQuantity);
             }
+            int totalPrice = order.CalculateOrderPrice();
             account.Balance -= totalPrice;
         }
         else

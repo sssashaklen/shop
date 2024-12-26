@@ -1,8 +1,13 @@
 ﻿namespace shop.DB
 {
-    public class OrderRepository(DbContext dbContext) : IOrderRepository
+    public class OrderRepository : IOrderRepository
     {
-        private readonly DbContext _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+        private readonly DbContext _dbContext;
+
+        public OrderRepository(DbContext dbContext)
+        {
+            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+        }
 
         public void Create(Order order)
         {
@@ -38,17 +43,19 @@
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
         }
 
-        public Order Create(Account account)
+        public void Create(Order order)
         {
-            if (account.Cart == null)
+            if (order == null)
             {
-                throw new ArgumentNullException("Order cannot be null.");
+                throw new ArgumentNullException(nameof(order), "Order cannot be null.");
             }
-            
-            var order = new Order(account.Id, account.Cart);
-            
+
+            if (order.CustomerId <= 0)
+            {
+                throw new ArgumentException("Customer ID must be a positive integer.", nameof(order.CustomerId));
+            }
+
             _orderRepository.Create(order);
-            return order;
         }
 
         public Order ReadById(int id)
