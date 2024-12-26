@@ -2,7 +2,7 @@
 
 namespace kursach;
 
-public class UserManager
+public static class UserManager
 {
     private static Account _currentAccount;
     

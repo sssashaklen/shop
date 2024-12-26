@@ -34,12 +34,10 @@
 
         public CartItem(Product product, int quantity)
         {
-            if (product == null) 
-                throw new ArgumentNullException(nameof(product), "Product cannot be null.");
             if (quantity <= 0) 
                 throw new ArgumentException("Quantity must be greater than zero.", nameof(quantity));
         
-            Product = product; 
+            Product = product ?? throw new ArgumentNullException(nameof(product), "Product cannot be null."); 
             Quantity = quantity; 
         }
 

@@ -1,13 +1,8 @@
 ﻿namespace shop.DB
 {
-    public class OrderRepository : IOrderRepository
+    public class OrderRepository(DbContext dbContext) : IOrderRepository
     {
-        private readonly DbContext _dbContext;
-
-        public OrderRepository(DbContext dbContext)
-        {
-            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-        }
+        private readonly DbContext _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
 
         public void Create(Order order)
         {
@@ -34,14 +29,9 @@
         }
     }
     
-    public class OrderService : IOrderService
+    public class OrderService(IOrderRepository orderRepository) : IOrderService
     {
-        private readonly IOrderRepository _orderRepository;
-
-        public OrderService(IOrderRepository orderRepository)
-        {
-            _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
-        }
+        private readonly IOrderRepository _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
 
         public void Create(Order order)
         {

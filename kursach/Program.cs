@@ -8,7 +8,6 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        UserManager userManager = new UserManager();
         DbContext db = new DbContext();
         db.Seed();
         AccountRepository accountRepository = new AccountRepository(db);
