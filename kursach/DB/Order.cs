@@ -1,13 +1,8 @@
 ﻿namespace shop.DB
 {
-    public class OrderRepository : IOrderRepository
+    public class OrderRepository(DbContext dbContext) : IOrderRepository
     {
-        private readonly DbContext _dbContext;
-
-        public OrderRepository(DbContext dbContext)
-        {
-            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-        }
+        private readonly DbContext _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
 
         public void Create(Order order)
         {
@@ -43,19 +38,17 @@
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
         }
 
-        public void Create(Order order)
+        public Order Create(Account account)
         {
-            if (order == null)
+            if (account.Cart == null)
             {
-                throw new ArgumentNullException(nameof(order), "Order cannot be null.");
+                throw new ArgumentNullException("Order cannot be null.");
             }
-
-            if (order.CustomerId <= 0)
-            {
-                throw new ArgumentException("Customer ID must be a positive integer.", nameof(order.CustomerId));
-            }
-
+            
+            var order = new Order(account.Id, account.Cart);
+            
             _orderRepository.Create(order);
+            return order;
         }
 
         public Order ReadById(int id)

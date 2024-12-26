@@ -34,7 +34,7 @@ public interface IAccountService
 
 public interface IOrderService
 {
-    void Create(Order order);
+    Order Create(Account account);
     Order ReadById(int id); 
     List<Order> ReadAll();
     void Delete(int id);

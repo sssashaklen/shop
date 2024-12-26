@@ -13,32 +13,12 @@
         
         public Order(int customerId, Cart cart)
         {
-            OrderId = GetNextId(); 
+            OrderId = _globalID++; 
             CustomerId = customerId;
             OrderDate = DateTime.Now.ToString("yyyy-MM-dd");
             OrderTime = DateTime.Now.ToString("HH:mm:ss");  
             Products = cart.Products; 
-            OrderPrice = CalculateOrderPrice(); 
-        }
-        
-        private static int GetNextId()
-        {
-            return ++_globalID;
-        }
-        
-        public int CalculateOrderPrice()
-        {
-            int totalPrice = 0;
-
-            if (Products != null)
-            {
-                foreach (var item in Products)
-                {
-                    totalPrice += item.Product.price * item.Quantity; 
-                }
-            }
-
-            return totalPrice;
+            OrderPrice = cart.totalPrice; 
         }
     }
 }

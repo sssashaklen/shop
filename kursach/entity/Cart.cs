@@ -1,8 +1,9 @@
 ﻿namespace shop;
 
-    public class Cart(List<CartItem>? products = null)
+    public class Cart(List<CartItem> products)
     {
-        public List<CartItem> Products { get; } = products ?? new List<CartItem>();
+        public List<CartItem> Products { get; } = products;
+        public int totalPrice;
 
         public void AddToCart(Product product, int quantity)
         {
@@ -23,6 +24,7 @@
             else
             {
                 Products.Add(item);
+                totalPrice += item.Quantity * product.price;
             }
         }
     }
@@ -34,12 +36,10 @@
 
         public CartItem(Product product, int quantity)
         {
-            if (product == null) 
-                throw new ArgumentNullException(nameof(product), "Product cannot be null.");
             if (quantity <= 0) 
                 throw new ArgumentException("Quantity must be greater than zero.", nameof(quantity));
         
-            Product = product; 
+            Product = product ?? throw new ArgumentNullException(nameof(product), "Product cannot be null."); 
             Quantity = quantity; 
         }
 
